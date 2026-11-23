@@ -14,7 +14,7 @@ module.exports = {
   module: {
     rules: [
       // { test: /\.jsx?$/, exclude: /node_modules/, use: 'babel-loader' },
-      // { test: /\.css$/, use: ['style-loader', 'css-loader'] },
+      { test: /\.css$/, use: ['style-loader', 'css-loader'] },
       // { test: /\.(png|jpe?g|gif|svg)$/i, type: 'asset/resource' },
        // Images
       {
