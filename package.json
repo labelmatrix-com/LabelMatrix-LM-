@@ -2,20 +2,20 @@
   "name": "labelmatrix-studio",
   "version": "1.0.0",
   "private": true,
-  "description": "Universal product back-label design, barcode generator and QR code generator",
+  "description": "React 18 + Webpack 5 product and universal label design workspace with custom canvas, site branding, barcode and QR generation, print and PDF export.",
   "scripts": {
-    "dev": "nodemon --watch src --ext ts --exec npx webpack serve --mode development",
+    "dev": "webpack serve --mode development",
     "start": "webpack serve --mode development --open",
     "build": "webpack --mode production",
     "format": "prettier --write \"src/**/*.{js,jsx,css}\" \"public/**/*.{html}\" \"*.js\"",
-    "format:check": "prettier --check \"src/**/*.{js,jsx,css}\" \"public/**/*.{html}\" \"*.js\""
+    "format:check": "prettier --check \"src/**/*.{js,jsx,css}\" \"public/**/*.{html}\" \"*.js\"",
+    "analyze": "webpack --mode production --stats"
   },
   "dependencies": {
     "html2canvas": "^1.4.1",
     "jquery": "^3.7.1",
     "jsbarcode": "^3.11.6",
     "jspdf": "^2.5.2",
-    "nodemon": "^3.1.14",
     "qrcode": "^1.5.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -29,7 +29,6 @@
     "babel-loader": "^9.2.1",
     "css-loader": "^7.1.2",
     "html-webpack-plugin": "^5.6.3",
-    "nodemon-webpack-plugin": "^4.8.2",
     "prettier": "^3.4.2",
     "style-loader": "^4.0.0",
     "webpack": "^5.97.1",

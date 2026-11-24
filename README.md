@@ -1,56 +1,27 @@
-# LabelMatrix Professional Studio
+# LabelMatrix Studio — Production Build
 
-**Universal product back-label design, barcode generation and QR code generation.**
+React 18 + Webpack 5 label-design workspace with a product back-label studio and a separate universal label editor, selectable table/paragraph content, multi-logo positioning, barcode and QR generation, validation checks, print output and PDF export.
 
-LabelMatrix is structured for products across many industries and destination markets. Category templates adapt the recommended back-label prompts for food and beverages, cosmetics, pharmaceuticals and medical devices, household products, electronics, apparel, toys, automotive, chemicals, industrial equipment, construction materials, jewelry, pet products, sports products, stationery, home and garden products, and custom products.
+## Included features
 
-## Main capabilities
+- **Universal Label Editor:** create product, packaging, shipping, retail and custom labels with custom width/height, background color, editable title, website URL, movable site logo, text blocks, uploaded images/logos and divider lines. Drag elements directly on the canvas, resize them, save the design in browser storage, export a JSON design file, print or export a size-specific PDF.
+- **Site identity:** the LabelMatrix logo appears in the application navigation and is included as a movable default site-logo element on the universal label. Replace it with a company or website logo at any time.
+- **Label content layout:** switch between a compact key/value table and paragraph-style declarations without changing the underlying product data. In Universal Label Editor, add, edit and remove field/value rows; the selected layout is reflected in the live canvas and PDF/print output.
+- **Multiple logos:** upload multiple PNG, JPEG, SVG or WebP images; drag them anywhere over the label; resize with the editor controls (and with the corner handle in Back Label Studio); rotate, lock/unlock, duplicate, delete, change stacking order, and center horizontally or vertically. Universal Editor optimizes raster images to WebP before browser storage where supported.
+- **Print and PDF:** the logo layer and chosen content layout are part of the label DOM captured for PDF export and browser printing.
+- **Barcode and QR:** EAN-13 and UPC-A check-digit validation, Code 128 internal labels, SVG barcode download and QR generation.
+- **Optimized build:** hashed assets, filesystem build cache, deterministic module IDs, runtime/vendor splitting, minification, compressed dev-server responses, and deferred PDF dependencies.
+- **Smaller brand asset:** optimized WebP logo replaces the large PNG in the application bundle.
 
-- Category-driven back-label fields for materials / ingredients, specifications, usage or care instructions, and warnings.
-- Destination-market selection and free-text label-language entry (translations are supplied by the user).
-- Product identity, SKU / model, pack size, origin, batch / lot, date, manufacturer and customer-support details.
-- Barcode generation for Code 128, EAN-13, EAN-8, UPC-A, UPC-E, ITF-14, Code 39, Interleaved 2 of 5, MSI and Pharmacode.
-- QR generation from a website URL or arbitrary text.
-- Live back-label preview, barcode SVG download, QR PNG download, printing and print-size PDF export.
-- Component-based React architecture and the supplied LabelMatrix brand logo.
+## Requirements
 
-The current selector includes 18 category templates, including a custom-product option and destination-market options for global workflows.
+- Node.js 18.18+ (Node.js 20 LTS recommended)
+- npm 9+
 
-## Project structure
-
-```text
-src/
-├── assets/
-│   └── labelmatrix-logo.png
-├── components/
-│   ├── Brand.jsx
-│   ├── Brand.css
-│   ├── Field.jsx
-│   ├── SelectField.jsx
-│   ├── SelectField.jsx
-│   ├── Sidebar.jsx
-│   ├── StatCard.jsx
-│   └── Topbar.jsx
-├── constants/
-│   └── productCategories.js
-├── hooks/
-│   └── useLabelStudio.js
-├── pages/
-│   ├── LabelStudio.jsx
-│   ├── Checks.jsx
-│   ├── Overview.jsx
-│   └── Settings.jsx
-├── utils/
-│   └── barcode.js
-├── App.jsx
-├── index.jsx
-└── styles.css
-```
-
-## Run locally
+## Install and run
 
 ```bash
-npm install
+npm ci
 npm start
 ```
 
@@ -59,24 +30,44 @@ Open `http://localhost:3000`.
 ## Production build
 
 ```bash
-npm run format
-npm run format:check
 npm run build
 ```
 
-Webpack writes production assets to `dist/`.
+Webpack writes deployable static files to `dist/`. Run a local production preview with any static HTTP server, for example:
 
-## Barcode and regulatory notes
+```bash
+npx serve dist
+```
 
-- LabelMatrix encodes the barcode data entered by the user; it does not allocate or issue GTINs.
-- Retail barcodes must use identifiers legitimately assigned to the responsible company through the applicable numbering authority / GS1 Member Organisation.
-- Internal Code 128, Code 39 and other operational formats are not a substitute for a retail GTIN where one is required.
-- Barcode format validation is a client-side format/check-digit aid, not confirmation that a number is officially assigned or globally unique.
-- QR codes encode the exact URL or text entered by the user. Users must test the destination and content before printing.
-- Regulatory requirements vary by product type and destination market. The market selector is a workflow aid, not an automatic legal-compliance engine. The responsible business must obtain qualified review of required declarations, languages, symbols, warnings and artwork.
+## Netlify deployment
 
-## Current implementation boundaries
+The included `netlify.toml` builds with `npm run build` and publishes `dist`. The SPA fallback is configured for client-side routes.
 
-- The current application uses browser-local React state; it does not yet persist projects to a server or support user accounts, cloud workspaces or team collaboration.
-- PDF output is generated from the browser preview as a raster image. For commercial prepress workflows, add a vector / print-PDF pipeline, embedded fonts, colour-management checks, bleed and printer-specific output profiles.
-- The current category templates are configurable starting points, not a complete catalogue of every country's legal requirements.
+## Environment configuration
+
+Copy `.env.example` to `.env` for local configuration. No API keys or secrets are required by the current frontend. Never place private credentials in a `REACT_APP_*` or other browser-exposed variable.
+
+## Project structure
+
+```text
+src/
+  components/LogoCanvas.jsx   # draggable, resizable multi-logo layer
+  components/                 # shared UI components
+  hooks/useLabelStudio.js     # label state and barcode/QR generation
+  pages/LabelStudio.jsx       # product back-label editor and live preview
+  pages/UniversalLabelEditor.jsx # flexible canvas, title, site logo and custom elements
+  utils/barcode.js            # barcode validation helpers
+  App.jsx                     # navigation, print and PDF export
+  styles.css                  # application and label styles
+public/index.html
+webpack.config.js
+netlify.toml
+```
+
+## Build after source updates
+
+The ZIP contains the updated React source. Run `npm ci` followed by `npm run build` to regenerate `dist/` before local static hosting. Netlify performs this build automatically using the included configuration.
+
+## Important production note
+
+This is a production-buildable frontend, not a complete multi-user SaaS backend. Universal Editor saves its design in browser local storage; Back Label Studio keeps its active editing state in browser memory. Export design JSON regularly as a portable backup. Before deploying for customer accounts or regulated production workflows, add authenticated server-side storage, database-backed projects, upload validation/scanning, access controls, backups, audit logging and server-side export where required. Verify final label declarations, barcode ownership, physical dimensions, bleed and printer calibration with the responsible brand owner/printer. LabelMatrix does not issue GS1 GTINs or certify regulatory compliance.

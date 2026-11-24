@@ -1,39 +1,17 @@
 import { useEffect, useMemo, useState } from 'react';
 import JsBarcode from 'jsbarcode';
 import QRCode from 'qrcode';
-import { validateBarcode } from '../utils/barcode';
+import { eanCheck, upcCheck } from '../utils/barcode';
 
 export const initialLabel = {
-  product: '',
-  brand: '',
-  category: 'General merchandise',
-  targetMarket: 'Global / multiple markets',
-  language: 'English',
-  productId: '',
-  packSize: '',
-  categoryFields: {
-    'General merchandise': {
-      composition: '',
-      specifications: '',
-      instructions: '',
-      warnings: '',
-    },
-  },
-  batchLot: '',
-  manufactureDate: '',
-  expiryDate: '',
-  countryOrigin: '',
-  responsibleParty: '',
-  serviceContact: '',
-  website: '',
-  customFieldLabel: '',
-  customFieldContent: '',
-  barcodeType: 'CODE128',
-  barcodeValue: '',
-  barcodeMode: 'internal',
-  qrValue: '',
-  labelWidthMm: '100',
-  labelHeightMm: '150',
+  product: 'Organic Almond Cookies', brand: 'NORTH & NATURE', category: 'Food',
+  ingredients: 'Almonds (42%), oats, dates, coconut oil, sea salt.',
+  allergen: 'Contains tree nuts. May contain traces of peanuts.',
+  net: '150 g', mrp: '₹199.00', batch: 'BATCH-2408', mfg: '22/11/2026',
+  best: '21/05/2027', maker: 'North & Nature Foods, Jaipur, Rajasthan, India',
+  care: '+91 98765 43210 | care@example.in', website: 'https://example.in',
+  barcodeType: 'EAN13', barcodeValue: '', qrValue: 'https://example.in/product/almond-cookies',
+  barcodeMode: 'customer', labelFormat: 'table', logos: []
 };
 
 export default function useLabelStudio() {
@@ -41,83 +19,30 @@ export default function useLabelStudio() {
   const [barcodeSvg, setBarcodeSvg] = useState('');
   const [qrData, setQrData] = useState('');
 
-  const update = (key, value) => {
-    const categoryFieldKeys = ['composition', 'specifications', 'instructions', 'warnings'];
-    setData((current) => {
-      if (categoryFieldKeys.includes(key)) {
-        const currentCategoryFields = current.categoryFields || {};
-        return {
-          ...current,
-          categoryFields: {
-            ...currentCategoryFields,
-            [current.category]: {
-              ...(currentCategoryFields[current.category] || {}),
-              [key]: value,
-            },
-          },
-        };
-      }
-      return { ...current, [key]: value };
-    });
-  };
-
-  const barcodeValidation = useMemo(
-    () => validateBarcode(data.barcodeValue, data.barcodeType),
-    [data.barcodeValue, data.barcodeType],
-  );
-  const barcodeValid = barcodeValidation.valid;
+  const update = (key, value) => setData((current) => ({ ...current, [key]: typeof value === 'function' ? value(current[key]) : value }));
+  const barcodeValid = useMemo(() => {
+    const value = data.barcodeValue.trim();
+    if (!value) return false;
+    if (data.barcodeType === 'EAN13') return /^\d{13}$/.test(value) && eanCheck(value);
+    if (data.barcodeType === 'UPC') return /^\d{12}$/.test(value) && upcCheck(value);
+    return /^[\x20-\x7E]{1,80}$/.test(value);
+  }, [data.barcodeValue, data.barcodeType]);
 
   useEffect(() => {
-    if (!data.barcodeValue.trim() || !barcodeValid) {
-      setBarcodeSvg('');
-      return undefined;
-    }
-
+    if (!data.barcodeValue.trim()) { setBarcodeSvg(''); return; }
     try {
       const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      JsBarcode(svg, data.barcodeValue.trim(), {
-        format: data.barcodeType,
-        lineColor: '#101828',
-        background: '#ffffff',
-        width: 1.65,
-        height: 48,
-        displayValue: true,
-        fontSize: 12,
-        margin: 5,
-      });
+      JsBarcode(svg, data.barcodeValue, { format: data.barcodeType, lineColor: '#111827', background: '#ffffff', width: 1.65, height: 48, displayValue: true, fontSize: 12, margin: 5 });
       setBarcodeSvg(new XMLSerializer().serializeToString(svg));
-    } catch {
-      setBarcodeSvg('');
-    }
-    return undefined;
-  }, [data.barcodeValue, data.barcodeType, barcodeValid]);
+    } catch { setBarcodeSvg(''); }
+  }, [data.barcodeValue, data.barcodeType]);
 
   useEffect(() => {
     let alive = true;
-    if (!data.qrValue.trim()) {
-      setQrData('');
-      return () => {
-        alive = false;
-      };
-    }
-
-    QRCode.toDataURL(data.qrValue.trim(), {
-      width: 240,
-      margin: 2,
-      errorCorrectionLevel: 'H',
-      color: { dark: '#101828', light: '#ffffff' },
-    })
-      .then((url) => {
-        if (alive) setQrData(url);
-      })
-      .catch(() => {
-        if (alive) setQrData('');
-      });
-
-    return () => {
-      alive = false;
-    };
+    QRCode.toDataURL(data.qrValue || 'https://example.in', { width: 220, margin: 1, errorCorrectionLevel: 'H', color: { dark: '#101828', light: '#ffffff' } })
+      .then((url) => { if (alive) setQrData(url); }).catch(() => setQrData(''));
+    return () => { alive = false; };
   }, [data.qrValue]);
 
-  return { data, update, barcodeSvg, qrData, barcodeValid, barcodeValidation };
+  return { data, update, barcodeSvg, qrData, barcodeValid };
 }

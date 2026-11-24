@@ -1,5 +1,5 @@
 import React from 'react';
-import { FiMenu } from 'react-icons/fi';
+import { FiMenu, FiSearch } from 'react-icons/fi';
 
 export default function Topbar({ active, setMobile }) {
   return (
@@ -7,8 +7,9 @@ export default function Topbar({ active, setMobile }) {
       <button className="mobile-menu" aria-label="Open navigation" onClick={() => setMobile(true)}><FiMenu /></button>
       <div className="crumb">Workspace <span>/</span> <b>{active}</b></div>
       <div className="top-actions">
-        <div className="status-pill"><i /> Local workspace</div>
-        <div className="avatar top-avatar" aria-label="LabelMatrix workspace">LM</div>
+        <div className="searchbox"><FiSearch /><input aria-label="Search projects" placeholder="Search projects..." /></div>
+        <div className="status-pill"><i /> All systems operational</div>
+        <div className="avatar top-avatar">LM</div>
       </div>
     </header>
   );
