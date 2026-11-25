@@ -1,6 +1,7 @@
 import React from 'react';
 import { FiGrid, FiLayers, FiCheckCircle, FiSettings, FiShield, FiArrowUpRight, FiX, FiMaximize } from 'react-icons/fi';
 import Brand from './Brand';
+import DonateCom from './DonateCom';
 
 const navigation = [
   ['Overview', FiGrid],
@@ -32,7 +33,10 @@ export default function Sidebar({ active, setActive, mobile, setMobile, runCheck
           <p>Design, customize and prepare every label format with confidence.</p>
           <button onClick={runChecks}>Run label checks <FiArrowUpRight /></button>
         </div>
-        <div className="profile"><div className="avatar">LM</div><div><b>LabelMatrix Admin</b><small>Studio workspace</small></div><FiSettings /></div>
+        <div className="profile">
+          <div><DonateCom/></div>
+          {/* <div className="avatar">LM</div><div><b>LabelMatrix Admin</b><small>Studio workspace</small></div><FiSettings /> */}
+          </div>
       </div>
     </aside>
   );
